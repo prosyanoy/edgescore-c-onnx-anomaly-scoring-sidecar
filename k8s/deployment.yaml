@@ -1,0 +1,83 @@
+# One Pod, two containers: the demo log producer and the EdgeScore scoring sidecar.
+# The sidecar is a Kubernetes "native sidecar" (init container with restartPolicy: Always,
+# GA in 1.29): it starts and becomes Ready *before* the app, and is stopped after it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  namespace: edgescore-demo
+  labels: {app: demo-app}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-app}
+  template:
+    metadata:
+      labels: {app: demo-app}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8088"
+        prometheus.io/path: /metrics
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      initContainers:
+        - name: edgescore
+          image: edgescore:latest
+          imagePullPolicy: IfNotPresent   # `kind load docker-image` side-loads it; no registry needed
+          restartPolicy: Always           # <- makes this init container a sidecar
+          ports:
+            - {name: http, containerPort: 8088}
+          env:
+            - {name: EDGESCORE_BIND, value: "0.0.0.0"}
+            - {name: EDGESCORE_WORKERS, value: "2"}
+            - {name: EDGESCORE_QUEUE_CAPACITY, value: "8192"}
+            - {name: EDGESCORE_MAX_BATCH, value: "64"}
+            # Optional HEC auth: create the secret yourself, e.g.
+            #   kubectl -n edgescore-demo create secret generic edgescore-hec --from-literal=token=<your-token>
+            - name: EDGESCORE_HEC_TOKEN
+              valueFrom:
+                secretKeyRef: {name: edgescore-hec, key: token, optional: true}
+          startupProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 1
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 250m, memory: 128Mi}
+            limits: {cpu: "2", memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+      containers:
+        - name: app
+          image: python:3.12-slim
+          command: ["python", "-u", "/app/producer.py"]
+          env:
+            - {name: PRODUCER_TARGET, value: "http://127.0.0.1:8088/services/collector/event"}
+            - {name: PRODUCER_RATE, value: "200"}
+            - {name: PRODUCER_ANOMALY_RATE, value: "0.03"}
+            - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+            - name: EDGESCORE_HEC_TOKEN
+              valueFrom:
+                secretKeyRef: {name: edgescore-hec, key: token, optional: true}
+          volumeMounts:
+            - {name: producer, mountPath: /app, readOnly: true}
+          resources:
+            requests: {cpu: 50m, memory: 32Mi}
+            limits: {cpu: 250m, memory: 128Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+      volumes:
+        - name: producer
+          configMap:
+            name: demo-producer

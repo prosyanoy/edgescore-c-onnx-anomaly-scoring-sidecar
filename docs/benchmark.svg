@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 460" width="820" height="460" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" role="img" aria-label="EdgeScore versus Python baseline: events per second and request p99 latency">
+<title>EdgeScore vs. Python baseline (same ONNX model)</title>
+<rect width="820" height="460" rx="10" fill="#ffffff" stroke="#d8dee4"/>
+<text x="24" y="32" font-size="18" font-weight="700" fill="#1f2328">EdgeScore (C++) vs. naive Python baseline</text>
+<text x="24" y="52" font-size="12" fill="#59636e">Same ONNX model and API, 50 events/request, 2 clients, 2-vCPU VM shared with the load generator</text>
+<text x="24" y="88" font-size="15" font-weight="600" fill="#1f2328">Throughput, events per second</text>
+<text x="24" y="106" font-size="12" fill="#59636e">higher is better</text>
+<text x="178" y="139" font-size="13" text-anchor="end" fill="#1f2328">Python baseline</text>
+<path d="M190 122 H192.1 a4 4 0 0 1 4 4 V140 a4 4 0 0 1 -4 4 H190 Z" fill="#8c959f"/>
+<text x="204.1" y="138" font-size="13" font-weight="600" fill="#1f2328">1,067</text>
+<text x="178" y="173" font-size="13" text-anchor="end" fill="#1f2328">EdgeScore /v1/score</text>
+<path d="M190 156 H378.1 a4 4 0 0 1 4 4 V174 a4 4 0 0 1 -4 4 H190 Z" fill="#0b6bcb"/>
+<text x="390.1" y="172" font-size="13" font-weight="600" fill="#1f2328">33,362  (31x)</text>
+<text x="178" y="207" font-size="13" text-anchor="end" fill="#1f2328">EdgeScore HEC ingest*</text>
+<path d="M190 190 H686.0 a4 4 0 0 1 4 4 V208 a4 4 0 0 1 -4 4 H190 Z" fill="#0b6bcb"/>
+<text x="698.0" y="206" font-size="13" font-weight="600" fill="#1f2328">86,834  (81x)</text>
+<line x1="190" y1="118" x2="190" y2="224" stroke="#d8dee4"/>
+<text x="24" y="264" font-size="15" font-weight="600" fill="#1f2328">Request p99 latency, ms (50 events per request)</text>
+<text x="24" y="282" font-size="12" fill="#59636e">lower is better</text>
+<text x="178" y="315" font-size="13" text-anchor="end" fill="#1f2328">Python baseline</text>
+<path d="M190 298 H686.0 a4 4 0 0 1 4 4 V316 a4 4 0 0 1 -4 4 H190 Z" fill="#8c959f"/>
+<text x="698.0" y="314" font-size="13" font-weight="600" fill="#1f2328">51.9 ms</text>
+<text x="178" y="349" font-size="13" text-anchor="end" fill="#1f2328">EdgeScore /v1/score</text>
+<path d="M190 332 H234.2 a4 4 0 0 1 4 4 V350 a4 4 0 0 1 -4 4 H190 Z" fill="#0b6bcb"/>
+<text x="246.2" y="348" font-size="13" font-weight="600" fill="#1f2328">5.0 ms</text>
+<text x="178" y="383" font-size="13" text-anchor="end" fill="#1f2328">EdgeScore HEC ingest*</text>
+<path d="M190 366 H213.9 a4 4 0 0 1 4 4 V384 a4 4 0 0 1 -4 4 H190 Z" fill="#0b6bcb"/>
+<text x="225.9" y="382" font-size="13" font-weight="600" fill="#1f2328">2.9 ms</text>
+<line x1="190" y1="294" x2="190" y2="400" stroke="#d8dee4"/>
+<text x="24" y="446" font-size="11" fill="#59636e">* HEC row deliberately overloads the queue; events/s counts accepted events until drained, excess got 503 (backpressure).</text>
+</svg>

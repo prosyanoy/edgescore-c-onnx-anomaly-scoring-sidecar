@@ -1,0 +1,11 @@
+# Exposes the sidecar's HTTP API (HEC ingest, /v1/results, /metrics) inside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: edgescore
+  namespace: edgescore-demo
+  labels: {app: demo-app}
+spec:
+  selector: {app: demo-app}
+  ports:
+    - {name: http, port: 8088, targetPort: http}

@@ -1,0 +1,32 @@
+# build output
+build/
+build-*/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+Testing/
+
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.tmp/
+
+# generated model artifacts (rebuilt by `make model` / Docker)
+models/*.onnx
+models/*.json
+
+# secrets / local env
+.env
+.env.*
+!.env.example
+
+# editor / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
